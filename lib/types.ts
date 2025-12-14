@@ -4,6 +4,8 @@ export interface Activity {
   id: string;
   name: string;
   icon: LucideIcon;
+  type?: 'passive' | 'interactive';
+  interactiveComponent?: 'bubble-wrap' | 'ripple-pond' | 'doodle-pad';
   isCustom?: boolean;
 }
 

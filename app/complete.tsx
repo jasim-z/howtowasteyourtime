@@ -19,19 +19,18 @@ import { useStats } from '@/lib/StatsContext';
 import { formatTime } from '@/lib/statsStorage';
 import { checkMilestones } from '@/lib/milestones';
 import { Calendar } from 'lucide-react-native';
+import { haptics } from '@/lib/haptics';
 
 export default function CompleteScreen() {
   const router = useRouter();
-  const { activityId } = useLocalSearchParams<{ activityId: string }>();
+  const { activityId, isCustom } = useLocalSearchParams<{ activityId: string; isCustom?: string }>();
   const [activity, setActivity] = useState<Activity | null>(null);
   const { stats, refreshStats } = useStats();
 
   const loadActivity = useCallback(async () => {
-    // First check default activities
-    let foundActivity = defaultActivities.find((a) => a.id === activityId);
+    let foundActivity: Activity | undefined;
     
-    // If not found, check custom activities
-    if (!foundActivity) {
+    if (isCustom === 'true') {
       try {
         const customActivities = await loadCustomActivities();
         const customActivity = customActivities.find((a) => a.id === activityId);
@@ -43,16 +42,19 @@ export default function CompleteScreen() {
               name: customActivity.name,
               icon: Icon,
               isCustom: true,
+              type: 'passive',
             };
           }
         }
       } catch (error) {
         console.error('Error loading custom activities:', error);
       }
+    } else {
+      foundActivity = defaultActivities.find((a) => a.id === activityId);
     }
     
     setActivity(foundActivity || null);
-  }, [activityId]);
+  }, [activityId, isCustom]);
 
   useEffect(() => {
     loadActivity();
@@ -66,6 +68,7 @@ export default function CompleteScreen() {
   const confettiOpacity = useSharedValue(1);
 
   useEffect(() => {
+    haptics.success();
     // Bounce animation for icon
     iconScale.value = withSequence(
       withSpring(1.2),

@@ -1,12 +1,13 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { LucideIcon } from 'lucide-react-native';
+import { LucideIcon, Play } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { Nunito_400Regular, Nunito_600SemiBold } from '@expo-google-fonts/nunito';
 
 interface ActivityCardProps {
   icon: LucideIcon;
@@ -15,11 +16,12 @@ interface ActivityCardProps {
   onPress: () => void;
   onLongPress?: () => void;
   isCustom?: boolean;
+  isInteractive?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export function ActivityCard({ icon: Icon, name, selected, onPress, onLongPress, isCustom }: ActivityCardProps) {
+export function ActivityCard({ icon: Icon, name, selected, onPress, onLongPress, isCustom, isInteractive }: ActivityCardProps) {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -61,6 +63,11 @@ export function ActivityCard({ icon: Icon, name, selected, onPress, onLongPress,
             style={{ fontFamily: 'Nunito_400Regular', fontSize: 10 }}>
             Custom
           </Text>
+        </View>
+      )}
+      {isInteractive && (
+        <View className="absolute top-2 left-2 bg-primary/20 rounded-full p-1.5">
+          <Play size={12} color="#FF8A80" fill="#FF8A80" />
         </View>
       )}
       <Icon size={32} color={selected ? '#FF8A80' : '#5C5470'} />

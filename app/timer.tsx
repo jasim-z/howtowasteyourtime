@@ -4,29 +4,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Pause, Play, X } from 'lucide-react-native';
 import { CircularTimer } from '@/components/CircularTimer';
+import { InteractiveActivity } from '@/components/interactive/InteractiveActivity';
 import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities } from '@/lib/storage';
 import { Activity } from '@/lib/types';
-import { useStats } from '@/lib/StatsContext';
+import { Nunito_400Regular, Nunito_600SemiBold } from '@expo-google-fonts/nunito';
 
 const TOTAL_SECONDS = 300; // 5 minutes
 
 export default function TimerScreen() {
   const router = useRouter();
-  const { activityId } = useLocalSearchParams<{ activityId: string }>();
+  const { activityId, isCustom } = useLocalSearchParams<{ activityId: string; isCustom?: string }>();
   const [remainingSeconds, setRemainingSeconds] = useState(TOTAL_SECONDS);
   const [isPaused, setIsPaused] = useState(false);
   const [activity, setActivity] = useState<Activity | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const { addSession } = useStats();
 
   const loadActivity = useCallback(async () => {
-    // First check default activities
-    let foundActivity = defaultActivities.find((a) => a.id === activityId);
+    let foundActivity: Activity | undefined;
     
-    // If not found, check custom activities
-    if (!foundActivity) {
+    if (isCustom === 'true') {
       try {
         const customActivities = await loadCustomActivities();
         const customActivity = customActivities.find((a) => a.id === activityId);
@@ -38,16 +36,19 @@ export default function TimerScreen() {
               name: customActivity.name,
               icon: Icon,
               isCustom: true,
+              type: 'passive', // Custom activities are passive by default
             };
           }
         }
       } catch (error) {
         console.error('Error loading custom activities:', error);
       }
+    } else {
+      foundActivity = defaultActivities.find((a) => a.id === activityId);
     }
     
     setActivity(foundActivity || null);
-  }, [activityId]);
+  }, [activityId, isCustom]);
 
   useEffect(() => {
     loadActivity();
@@ -73,17 +74,14 @@ export default function TimerScreen() {
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
             }
-            // Save session and navigate to complete screen
-            const handleCompletion = async () => {
-              if (activity) {
-                await addSession(activity.name, TOTAL_SECONDS);
-              }
-              router.push({
-                pathname: '/complete',
-                params: { activityId: activityId || '' },
-              });
-            };
-            handleCompletion();
+            // Navigate to complete screen
+            router.push({
+              pathname: '/complete',
+              params: { 
+                activityId: activityId || '',
+                isCustom: isCustom || 'false',
+              },
+            });
             return 0;
           }
           return prev - 1;
@@ -100,7 +98,7 @@ export default function TimerScreen() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPaused, activityId, router, activity, addSession]);
+  }, [isPaused, activityId, isCustom, router]);
 
   const handlePauseResume = () => {
     setIsPaused(!isPaused);
@@ -125,6 +123,70 @@ export default function TimerScreen() {
     );
   }
 
+  const isInteractive = activity.type === 'interactive';
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  if (isInteractive) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <View className="flex-1">
+          {/* Top Bar with Activity Name and Mini Timer */}
+          <View className="pt-6 px-6 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2">
+              {ActivityIcon && <ActivityIcon size={20} color="#5C5470" />}
+              <Text 
+                className="text-lg font-semibold text-text"
+                style={{ fontFamily: 'Nunito_600SemiBold' }}>
+                {activity.name}
+              </Text>
+            </View>
+            <Text 
+              className="text-lg font-semibold text-text"
+              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              {formatTime(remainingSeconds)}
+            </Text>
+          </View>
+
+          {/* Interactive Component */}
+          <View className="flex-1 mt-4" style={{ paddingBottom: 100 }}>
+            {activity.interactiveComponent && (
+              <InteractiveActivity type={activity.interactiveComponent} />
+            )}
+          </View>
+
+          {/* Bottom Controls */}
+          <View className="px-6 pt-2 pb-6 flex-row justify-center items-center gap-6 bg-background">
+            <Pressable
+              onPress={handlePauseResume}
+              className="bg-primary rounded-full p-5 shadow-md">
+              {isPaused ? (
+                <Play size={24} color="white" />
+              ) : (
+                <Pause size={24} color="white" />
+              )}
+            </Pressable>
+
+            <Pressable
+              onPress={handleCancel}
+              className="bg-transparent flex-row items-center gap-2">
+              <X size={18} color="#5C5470" />
+              <Text 
+                className="text-text"
+                style={{ fontFamily: 'Nunito_400Regular' }}>
+                Cancel
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Passive activity - original design
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 items-center">

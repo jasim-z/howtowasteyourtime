@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -6,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import '../global.css';
 import { StatsProvider } from '@/lib/StatsContext';
@@ -74,30 +76,32 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <SafeAreaProvider>
-      <StatsProvider>
-        <ThemeProvider value={CustomTheme}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'slide_from_right',
-              gestureEnabled: true,
-              contentStyle: { backgroundColor: '#E8E0F0' },
-            }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="activities" />
-            <Stack.Screen name="timer" />
-            <Stack.Screen name="complete" />
-            <Stack.Screen
-              name="add-activity"
-              options={{
-                presentation: 'transparentModal',
-                animation: 'fade',
-              }}
-            />
-          </Stack>
-        </ThemeProvider>
-      </StatsProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatsProvider>
+          <ThemeProvider value={CustomTheme}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                animation: 'slide_from_right',
+                gestureEnabled: true,
+                contentStyle: { backgroundColor: '#E8E0F0' },
+              }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="activities" />
+              <Stack.Screen name="timer" />
+              <Stack.Screen name="complete" />
+              <Stack.Screen
+                name="add-activity"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'fade',
+                }}
+              />
+            </Stack>
+          </ThemeProvider>
+        </StatsProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

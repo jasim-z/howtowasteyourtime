@@ -9,6 +9,7 @@ import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities, saveCustomActivities } from '@/lib/storage';
 import { Activity, CustomActivity } from '@/lib/types';
+import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from '@expo-google-fonts/nunito';
 
 export default function ActivitiesScreen() {
   const router = useRouter();
@@ -93,7 +94,10 @@ export default function ActivitiesScreen() {
     if (selectedActivity) {
       router.push({
         pathname: '/timer',
-        params: { activityId: selectedActivity.id },
+        params: { 
+          activityId: selectedActivity.id,
+          isCustom: selectedActivity.isCustom ? 'true' : 'false',
+        },
       });
     }
   };
@@ -131,24 +135,64 @@ export default function ActivitiesScreen() {
           </Text>
         </View>
 
-        {/* Activity Grid */}
-        <View className="px-6 mt-6 flex-row flex-wrap" style={{ gap: 16 }}>
-          {allActivities.map((activity) => {
-            const Icon = activity.icon;
-            return (
-              <ActivityCard
-                key={activity.id}
-                icon={Icon}
-                name={activity.name}
-                selected={selectedActivity?.id === activity.id}
-                onPress={() => handleActivityPress(activity)}
-                onLongPress={() => handleLongPress(activity)}
-                isCustom={activity.isCustom}
-              />
-            );
-          })}
+        {/* Passive Activities Section */}
+        <View className="px-6 mt-6">
+          <Text 
+            className="text-lg font-semibold text-text mb-4"
+            style={{ fontFamily: 'Nunito_600SemiBold' }}>
+            Just sit there
+          </Text>
+          <View className="flex-row flex-wrap" style={{ gap: 16 }}>
+            {allActivities
+              .filter((a) => a.type !== 'interactive')
+              .map((activity) => {
+                const Icon = activity.icon;
+                return (
+                  <ActivityCard
+                    key={activity.id}
+                    icon={Icon}
+                    name={activity.name}
+                    selected={selectedActivity?.id === activity.id}
+                    onPress={() => handleActivityPress(activity)}
+                    onLongPress={() => handleLongPress(activity)}
+                    isCustom={activity.isCustom}
+                    isInteractive={activity.type === 'interactive'}
+                  />
+                );
+              })}
+          </View>
+        </View>
 
-          {/* Add Custom Button */}
+        {/* Interactive Activities Section */}
+        <View className="px-6 mt-8">
+          <Text 
+            className="text-lg font-semibold text-text mb-4"
+            style={{ fontFamily: 'Nunito_600SemiBold' }}>
+            Interactive
+          </Text>
+          <View className="flex-row flex-wrap" style={{ gap: 16 }}>
+            {allActivities
+              .filter((a) => a.type === 'interactive')
+              .map((activity) => {
+                const Icon = activity.icon;
+                return (
+                  <ActivityCard
+                    key={activity.id}
+                    icon={Icon}
+                    name={activity.name}
+                    selected={selectedActivity?.id === activity.id}
+                    onPress={() => handleActivityPress(activity)}
+                    onLongPress={() => handleLongPress(activity)}
+                    isCustom={activity.isCustom}
+                    isInteractive={activity.type === 'interactive'}
+                  />
+                );
+              })}
+          </View>
+        </View>
+
+        {/* Add Custom Button */}
+        <View className="px-6 mt-6">
           <Pressable
             onPress={() => router.push('/add-activity')}
             className="bg-transparent rounded-3xl p-5 items-center justify-center w-[47%] border-2 border-dashed border-textLight">
