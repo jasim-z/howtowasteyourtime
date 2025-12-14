@@ -131,6 +131,14 @@ function StackWithTheme() {
             cardShadowEnabled: false,
           }}>
           <Stack.Screen 
+            name="onboarding"
+            options={{
+              cardStyle: { backgroundColor: colors.background },
+              contentStyle: { backgroundColor: colors.background },
+              animation: 'fade',
+            }}
+          />
+          <Stack.Screen 
             name="index"
             options={{
               cardStyle: { backgroundColor: colors.background },

@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { CloudMoon, Clock } from 'lucide-react-native';
 import { Button } from '@/components/Button';
 import { MuteButton } from '@/components/MuteButton';
@@ -8,11 +9,40 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/lib/ThemeContext';
 import { useStats } from '@/lib/StatsContext';
 import { formatTime } from '@/lib/statsStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const ONBOARDING_KEY = 'has_seen_onboarding';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { stats } = useStats();
   const { colors, iconColor } = useTheme();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const hasSeenOnboarding = await AsyncStorage.getItem(ONBOARDING_KEY);
+        if (hasSeenOnboarding !== 'true') {
+          router.replace('/onboarding');
+        } else {
+          setIsChecking(false);
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        setIsChecking(false);
+      }
+    };
+    checkOnboarding();
+  }, [router]);
+
+  if (isChecking) {
+    return (
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
