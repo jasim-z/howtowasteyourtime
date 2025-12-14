@@ -8,6 +8,7 @@ import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities } from '@/lib/storage';
 import { Activity } from '@/lib/types';
+import { useStats } from '@/lib/StatsContext';
 
 const TOTAL_SECONDS = 300; // 5 minutes
 
@@ -18,6 +19,7 @@ export default function TimerScreen() {
   const [isPaused, setIsPaused] = useState(false);
   const [activity, setActivity] = useState<Activity | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { addSession } = useStats();
 
   const loadActivity = useCallback(async () => {
     // First check default activities
@@ -71,13 +73,17 @@ export default function TimerScreen() {
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
             }
-            // Navigate to complete screen
-            setTimeout(() => {
+            // Save session and navigate to complete screen
+            const handleCompletion = async () => {
+              if (activity) {
+                await addSession(activity.name, TOTAL_SECONDS);
+              }
               router.push({
                 pathname: '/complete',
                 params: { activityId: activityId || '' },
               });
-            }, 100);
+            };
+            handleCompletion();
             return 0;
           }
           return prev - 1;
@@ -94,7 +100,7 @@ export default function TimerScreen() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPaused, activityId, router]);
+  }, [isPaused, activityId, router, activity, addSession]);
 
   const handlePauseResume = () => {
     setIsPaused(!isPaused);

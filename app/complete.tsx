@@ -15,11 +15,16 @@ import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities } from '@/lib/storage';
 import { Activity } from '@/lib/types';
+import { useStats } from '@/lib/StatsContext';
+import { formatTime } from '@/lib/statsStorage';
+import { checkMilestones } from '@/lib/milestones';
+import { Calendar } from 'lucide-react-native';
 
 export default function CompleteScreen() {
   const router = useRouter();
   const { activityId } = useLocalSearchParams<{ activityId: string }>();
   const [activity, setActivity] = useState<Activity | null>(null);
+  const { stats, refreshStats } = useStats();
 
   const loadActivity = useCallback(async () => {
     // First check default activities
@@ -51,9 +56,11 @@ export default function CompleteScreen() {
 
   useEffect(() => {
     loadActivity();
-  }, [loadActivity]);
+    refreshStats();
+  }, [loadActivity, refreshStats]);
 
   const ActivityIcon = activity?.icon;
+  const milestone = stats ? checkMilestones(stats) : null;
 
   const iconScale = useSharedValue(1);
   const confettiOpacity = useSharedValue(1);
@@ -148,6 +155,17 @@ export default function CompleteScreen() {
           Proud of you.
         </Text>
 
+        {/* Milestone Celebration */}
+        {milestone && (
+          <View className="mx-6 mt-4 bg-primary/20 rounded-2xl p-4 border-2 border-primary">
+            <Text 
+              className="text-lg font-semibold text-text text-center"
+              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              {milestone.emoji} {milestone.message}
+            </Text>
+          </View>
+        )}
+
         {/* Completed Activity Card */}
         <View className="mx-6 mt-10 bg-card rounded-2xl p-5 shadow-sm">
           <Text 
@@ -165,15 +183,34 @@ export default function CompleteScreen() {
           </View>
         </View>
 
-        {/* Stats Badge */}
-        <View className="mx-6 mt-4 bg-secondary/50 rounded-xl p-3 flex-row items-center gap-2">
-          <Clock size={16} color="#5C5470" />
-          <Text 
-            className="text-sm text-text"
-            style={{ fontFamily: 'Nunito_400Regular' }}>
-            Total wasted today: 5 min
-          </Text>
-        </View>
+        {/* Stats Card */}
+        {stats && (
+          <View className="mx-6 mt-4 bg-secondary/30 rounded-2xl p-4">
+            <View className="flex-row items-center gap-2 mb-3">
+              <Clock size={16} color="#5C5470" />
+              <Text 
+                className="text-sm text-text"
+                style={{ fontFamily: 'Nunito_500Medium' }}>
+                Today: {formatTime(stats.totalSecondsToday)} wasted
+              </Text>
+            </View>
+            <View className="flex-row items-center gap-2">
+              <Calendar size={16} color="#5C5470" />
+              <Text 
+                className="text-sm text-text"
+                style={{ fontFamily: 'Nunito_500Medium' }}>
+                All time: {formatTime(stats.totalSecondsAllTime)}
+              </Text>
+            </View>
+            {stats.totalSecondsToday > 0 && (
+              <Text 
+                className="text-xs text-textLight text-center mt-3"
+                style={{ fontFamily: 'Nunito_400Regular' }}>
+                You've wasted {formatTime(stats.totalSecondsToday)} today. Keep it up!
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Buttons */}
         <View className="mt-12 px-6 w-full">

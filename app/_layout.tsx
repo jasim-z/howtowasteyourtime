@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 import '../global.css';
+import { StatsProvider } from '@/lib/StatsContext';
 
 import {
   Nunito_400Regular,
@@ -74,27 +75,29 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={CustomTheme}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: 'slide_from_right',
-            gestureEnabled: true,
-            contentStyle: { backgroundColor: '#E8E0F0' },
-          }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="activities" />
-          <Stack.Screen name="timer" />
-          <Stack.Screen name="complete" />
-          <Stack.Screen
-            name="add-activity"
-            options={{
-              presentation: 'transparentModal',
-              animation: 'fade',
-            }}
-          />
-        </Stack>
-      </ThemeProvider>
+      <StatsProvider>
+        <ThemeProvider value={CustomTheme}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: 'slide_from_right',
+              gestureEnabled: true,
+              contentStyle: { backgroundColor: '#E8E0F0' },
+            }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="activities" />
+            <Stack.Screen name="timer" />
+            <Stack.Screen name="complete" />
+            <Stack.Screen
+              name="add-activity"
+              options={{
+                presentation: 'transparentModal',
+                animation: 'fade',
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </StatsProvider>
     </SafeAreaProvider>
   );
 }

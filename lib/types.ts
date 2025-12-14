@@ -20,3 +20,18 @@ export interface TimerState {
   selectedActivity: Activity | null;
 }
 
+export interface WasteStats {
+  totalSecondsAllTime: number;
+  totalSecondsToday: number;
+  lastActiveDate: string; // ISO date string "2024-01-15"
+  sessionsToday: number;
+  sessionsAllTime: number;
+}
+
+export interface SessionRecord {
+  activityId: string;
+  activityName: string;
+  duration: number; // seconds
+  completedAt: string; // ISO timestamp
+}
+
