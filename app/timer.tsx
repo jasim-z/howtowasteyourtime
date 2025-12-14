@@ -9,6 +9,7 @@ import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities } from '@/lib/storage';
 import { Activity } from '@/lib/types';
+import { playSound } from '@/lib/sounds';
 import { Nunito_400Regular, Nunito_600SemiBold } from '@expo-google-fonts/nunito';
 
 const TOTAL_SECONDS = 300; // 5 minutes
@@ -63,6 +64,8 @@ export default function TimerScreen() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+    // Play chime sound when timer starts
+    playSound('chime');
   }, [activityId]);
 
   useEffect(() => {
@@ -74,14 +77,18 @@ export default function TimerScreen() {
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
             }
+            // Play complete sound before navigating
+            playSound('complete');
             // Navigate to complete screen
-            router.push({
-              pathname: '/complete',
-              params: { 
-                activityId: activityId || '',
-                isCustom: isCustom || 'false',
-              },
-            });
+            setTimeout(() => {
+              router.push({
+                pathname: '/complete',
+                params: { 
+                  activityId: activityId || '',
+                  isCustom: isCustom || 'false',
+                },
+              });
+            }, 300); // Small delay to let sound play
             return 0;
           }
           return prev - 1;

@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 
 const { width, height } = Dimensions.get('window');
 const BUBBLE_SIZE = 50;
@@ -35,6 +36,7 @@ function Bubble({ index, isPopped, onPop }: BubbleProps) {
   const handlePress = () => {
     if (!isPopped) {
       haptics.light();
+      playSound('pop');
       scale.value = withSpring(0.3, { damping: 15 });
       opacity.value = withTiming(0.2, { duration: 150 });
       onPop();

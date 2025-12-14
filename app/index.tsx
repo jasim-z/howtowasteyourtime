@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CloudMoon, Clock } from 'lucide-react-native';
 import { Button } from '@/components/Button';
+import { MuteButton } from '@/components/MuteButton';
 import { useStats } from '@/lib/StatsContext';
 import { formatTime } from '@/lib/statsStorage';
 
@@ -12,6 +13,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <MuteButton />
       <View className="flex-1">
         {/* Spacer */}
         <View className="flex-1" />

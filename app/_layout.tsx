@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import '../global.css';
 import { StatsProvider } from '@/lib/StatsContext';
+import { soundManager } from '@/lib/sounds';
 
 import {
   Nunito_400Regular,
@@ -64,8 +65,17 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      // Initialize sound manager
+      soundManager.init().catch(console.error);
     }
   }, [loaded]);
+
+  // Cleanup sounds on unmount
+  useEffect(() => {
+    return () => {
+      soundManager.cleanup().catch(console.error);
+    };
+  }, []);
 
   if (!loaded) {
     return null;

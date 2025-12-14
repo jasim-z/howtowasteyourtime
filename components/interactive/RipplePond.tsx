@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -22,6 +23,7 @@ export function RipplePond() {
   const handleTap = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
     haptics.light();
+    playSound('drop');
     
     const newRipple: Ripple = {
       id: Date.now().toString(),
