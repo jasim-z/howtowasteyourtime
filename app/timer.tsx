@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Pause, Play, X } from 'lucide-react-native';
 import { CircularTimer } from '@/components/CircularTimer';
-import { defaultActivities, Activity } from '@/constants/activities';
+import { defaultActivities } from '@/constants/activities';
+import { iconMap } from '@/constants/iconMap';
+import { loadCustomActivities } from '@/lib/storage';
+import { Activity } from '@/lib/types';
 
 const TOTAL_SECONDS = 300; // 5 minutes
 
@@ -13,9 +16,41 @@ export default function TimerScreen() {
   const { activityId } = useLocalSearchParams<{ activityId: string }>();
   const [remainingSeconds, setRemainingSeconds] = useState(TOTAL_SECONDS);
   const [isPaused, setIsPaused] = useState(false);
+  const [activity, setActivity] = useState<Activity | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const activity = defaultActivities.find((a) => a.id === activityId);
+  const loadActivity = useCallback(async () => {
+    // First check default activities
+    let foundActivity = defaultActivities.find((a) => a.id === activityId);
+    
+    // If not found, check custom activities
+    if (!foundActivity) {
+      try {
+        const customActivities = await loadCustomActivities();
+        const customActivity = customActivities.find((a) => a.id === activityId);
+        if (customActivity) {
+          const Icon = iconMap[customActivity.iconName];
+          if (Icon) {
+            foundActivity = {
+              id: customActivity.id,
+              name: customActivity.name,
+              icon: Icon,
+              isCustom: true,
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error loading custom activities:', error);
+      }
+    }
+    
+    setActivity(foundActivity || null);
+  }, [activityId]);
+
+  useEffect(() => {
+    loadActivity();
+  }, [loadActivity]);
+
   const ActivityIcon = activity?.icon;
 
   // Reset timer when activity changes

@@ -86,6 +86,13 @@ function RootLayoutNav() {
           <Stack.Screen name="activities" />
           <Stack.Screen name="timer" />
           <Stack.Screen name="complete" />
+          <Stack.Screen
+            name="add-activity"
+            options={{
+              presentation: 'transparentModal',
+              animation: 'fade',
+            }}
+          />
         </Stack>
       </ThemeProvider>
     </SafeAreaProvider>

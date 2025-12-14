@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -11,13 +11,48 @@ import Animated, {
   withSequence,
 } from 'react-native-reanimated';
 import { Button } from '@/components/Button';
-import { defaultActivities, Activity } from '@/constants/activities';
+import { defaultActivities } from '@/constants/activities';
+import { iconMap } from '@/constants/iconMap';
+import { loadCustomActivities } from '@/lib/storage';
+import { Activity } from '@/lib/types';
 
 export default function CompleteScreen() {
   const router = useRouter();
   const { activityId } = useLocalSearchParams<{ activityId: string }>();
-  
-  const activity = defaultActivities.find((a) => a.id === activityId);
+  const [activity, setActivity] = useState<Activity | null>(null);
+
+  const loadActivity = useCallback(async () => {
+    // First check default activities
+    let foundActivity = defaultActivities.find((a) => a.id === activityId);
+    
+    // If not found, check custom activities
+    if (!foundActivity) {
+      try {
+        const customActivities = await loadCustomActivities();
+        const customActivity = customActivities.find((a) => a.id === activityId);
+        if (customActivity) {
+          const Icon = iconMap[customActivity.iconName];
+          if (Icon) {
+            foundActivity = {
+              id: customActivity.id,
+              name: customActivity.name,
+              icon: Icon,
+              isCustom: true,
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error loading custom activities:', error);
+      }
+    }
+    
+    setActivity(foundActivity || null);
+  }, [activityId]);
+
+  useEffect(() => {
+    loadActivity();
+  }, [loadActivity]);
+
   const ActivityIcon = activity?.icon;
 
   const iconScale = useSharedValue(1);
