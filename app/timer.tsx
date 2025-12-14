@@ -10,12 +10,14 @@ import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities } from '@/lib/storage';
 import { Activity } from '@/lib/types';
 import { playSound } from '@/lib/sounds';
+import { useTheme } from '@/lib/ThemeContext';
 import { Nunito_400Regular, Nunito_600SemiBold } from '@expo-google-fonts/nunito';
 
 const TOTAL_SECONDS = 300; // 5 minutes
 
 export default function TimerScreen() {
   const router = useRouter();
+  const { colors, iconColor, iconColorLight } = useTheme();
   const { activityId, isCustom } = useLocalSearchParams<{ activityId: string; isCustom?: string }>();
   const [remainingSeconds, setRemainingSeconds] = useState(TOTAL_SECONDS);
   const [isPaused, setIsPaused] = useState(false);
@@ -120,10 +122,9 @@ export default function TimerScreen() {
 
   if (!activity) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center">
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
         <Text 
-          className="text-text"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.text }}>
           Activity not found
         </Text>
       </SafeAreaView>
@@ -139,21 +140,21 @@ export default function TimerScreen() {
 
   if (isInteractive) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
-        <View className="flex-1">
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+        <View className="flex-1" style={{ backgroundColor: colors.background }}>
           {/* Top Bar with Activity Name and Mini Timer */}
           <View className="pt-6 px-6 flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
-              {ActivityIcon && <ActivityIcon size={20} color="#5C5470" />}
+              {ActivityIcon && <ActivityIcon size={20} color={iconColor} />}
               <Text 
-                className="text-lg font-semibold text-text"
-                style={{ fontFamily: 'Nunito_600SemiBold' }}>
+                className="text-lg font-semibold"
+                style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
                 {activity.name}
               </Text>
             </View>
             <Text 
-              className="text-lg font-semibold text-text"
-              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              className="text-lg font-semibold"
+              style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
               {formatTime(remainingSeconds)}
             </Text>
           </View>
@@ -166,10 +167,11 @@ export default function TimerScreen() {
           </View>
 
           {/* Bottom Controls */}
-          <View className="px-6 pt-2 pb-6 flex-row justify-center items-center gap-6 bg-background">
+          <View className="px-6 pt-2 pb-6 flex-row justify-center items-center gap-6" style={{ backgroundColor: colors.background }}>
             <Pressable
               onPress={handlePauseResume}
-              className="bg-primary rounded-full p-5 shadow-md">
+              style={{ backgroundColor: colors.primary }}
+              className="rounded-full p-5 shadow-md">
               {isPaused ? (
                 <Play size={24} color="white" />
               ) : (
@@ -180,10 +182,9 @@ export default function TimerScreen() {
             <Pressable
               onPress={handleCancel}
               className="bg-transparent flex-row items-center gap-2">
-              <X size={18} color="#5C5470" />
+              <X size={18} color={iconColor} />
               <Text 
-                className="text-text"
-                style={{ fontFamily: 'Nunito_400Regular' }}>
+                style={{ fontFamily: 'Nunito_400Regular', color: colors.text }}>
                 Cancel
               </Text>
             </Pressable>
@@ -195,21 +196,21 @@ export default function TimerScreen() {
 
   // Passive activity - original design
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 items-center">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+      <View className="flex-1 items-center" style={{ backgroundColor: colors.background }}>
         {/* Top Section */}
         <View className="pt-8 px-6 items-center">
           <View className="flex-row items-center gap-2">
-            {ActivityIcon && <ActivityIcon size={24} color="#5C5470" />}
+            {ActivityIcon && <ActivityIcon size={24} color={iconColor} />}
             <Text 
-              className="text-xl font-semibold text-text"
-              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              className="text-xl font-semibold"
+              style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
               {activity.name}
             </Text>
           </View>
           <Text 
-            className="text-base text-textLight text-center mt-1"
-            style={{ fontFamily: 'Nunito_400Regular' }}>
+            className="text-base text-center mt-1"
+            style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
             In progress...
           </Text>
         </View>
@@ -225,8 +226,8 @@ export default function TimerScreen() {
 
         {/* Encouragement Text */}
         <Text 
-          className="text-lg text-textLight text-center mt-10"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          className="text-lg text-center mt-10"
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
           {isPaused ? "Taking a break from your break?" : "You're doing great at this."}
         </Text>
 
@@ -235,7 +236,8 @@ export default function TimerScreen() {
           {/* Pause/Resume Button */}
           <Pressable
             onPress={handlePauseResume}
-            className="bg-primary rounded-full p-5 shadow-md">
+            style={{ backgroundColor: colors.primary }}
+            className="rounded-full p-5 shadow-md">
             {isPaused ? (
               <Play size={28} color="white" />
             ) : (
@@ -247,10 +249,9 @@ export default function TimerScreen() {
           <Pressable
             onPress={handleCancel}
             className="bg-transparent flex-row items-center gap-2">
-            <X size={20} color="#5C5470" />
+            <X size={20} color={iconColor} />
             <Text 
-              className="text-text"
-              style={{ fontFamily: 'Nunito_400Regular' }}>
+              style={{ fontFamily: 'Nunito_400Regular', color: colors.text }}>
               Give up
             </Text>
           </Pressable>

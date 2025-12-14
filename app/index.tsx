@@ -4,31 +4,36 @@ import { useRouter } from 'expo-router';
 import { CloudMoon, Clock } from 'lucide-react-native';
 import { Button } from '@/components/Button';
 import { MuteButton } from '@/components/MuteButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/lib/ThemeContext';
 import { useStats } from '@/lib/StatsContext';
 import { formatTime } from '@/lib/statsStorage';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { stats } = useStats();
+  const { colors, iconColor } = useTheme();
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <MuteButton />
-      <View className="flex-1">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ThemeToggle />
+        <MuteButton />
+        <View className="flex-1">
         {/* Spacer */}
         <View className="flex-1" />
 
         {/* App Title */}
         <Text 
-          className="text-4xl font-bold text-text text-center"
-          style={{ fontFamily: 'Nunito_700Bold' }}>
+          className="text-4xl font-bold text-center"
+          style={{ fontFamily: 'Nunito_700Bold', color: colors.text }}>
           How To Waste Your Time
         </Text>
 
         {/* Subtitle */}
         <Text 
-          className="text-lg text-textLight text-center mt-2 italic"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          className="text-lg text-center mt-2 italic"
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
           A Mindless App
         </Text>
 
@@ -37,13 +42,13 @@ export default function HomeScreen() {
 
         {/* Icon */}
         <View className="items-center">
-          <CloudMoon size={80} color="#5C5470" />
+          <CloudMoon size={80} color={iconColor} />
         </View>
 
         {/* Tagline */}
         <Text 
-          className="text-xl text-text text-center mt-8"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          className="text-xl text-center mt-8"
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.text }}>
           Ready to do nothing?
         </Text>
 
@@ -54,10 +59,10 @@ export default function HomeScreen() {
         {stats && stats.totalSecondsToday > 0 && (
           <View className="mx-6 mb-4 items-center">
             <View className="flex-row items-center gap-2">
-              <Clock size={14} color="#8E8A9D" />
+              <Clock size={14} color={colors.textLight} />
               <Text 
-                className="text-sm text-textLight"
-                style={{ fontFamily: 'Nunito_400Regular' }}>
+                className="text-sm"
+                style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
                 You've wasted {formatTime(stats.totalSecondsToday)} today
               </Text>
             </View>
@@ -73,6 +78,7 @@ export default function HomeScreen() {
             className="shadow-lg"
           />
         </View>
+      </View>
       </View>
     </SafeAreaView>
   );

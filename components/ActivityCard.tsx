@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Nunito_400Regular, Nunito_600SemiBold } from '@expo-google-fonts/nunito';
+import { useTheme } from '@/lib/ThemeContext';
 
 interface ActivityCardProps {
   icon: LucideIcon;
@@ -22,6 +23,7 @@ interface ActivityCardProps {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function ActivityCard({ icon: Icon, name, selected, onPress, onLongPress, isCustom, isInteractive }: ActivityCardProps) {
+  const { colors, iconColor } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -52,28 +54,33 @@ export function ActivityCard({ icon: Icon, name, selected, onPress, onLongPress,
       onLongPress={onLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={animatedStyle}
-      className={`bg-card rounded-3xl p-5 items-center justify-center w-[47%] shadow-sm relative ${
-        selected ? 'border-2 border-primary' : 'border-2 border-transparent'
-      }`}>
+      style={[
+        animatedStyle,
+        {
+          backgroundColor: colors.card,
+          borderWidth: 2,
+          borderColor: selected ? colors.primary : 'transparent',
+        },
+      ]}
+      className="rounded-3xl p-5 items-center justify-center w-[47%] shadow-sm relative">
       {isCustom && (
-        <View className="absolute top-2 right-2 bg-secondary rounded-full px-2 py-0.5">
+        <View style={{ backgroundColor: colors.secondary }} className="absolute top-2 right-2 rounded-full px-2 py-0.5">
           <Text 
-            className="text-xs text-text"
-            style={{ fontFamily: 'Nunito_400Regular', fontSize: 10 }}>
+            className="text-xs"
+            style={{ fontFamily: 'Nunito_400Regular', fontSize: 10, color: colors.text }}>
             Custom
           </Text>
         </View>
       )}
       {isInteractive && (
-        <View className="absolute top-2 left-2 bg-primary/20 rounded-full p-1.5">
-          <Play size={12} color="#FF8A80" fill="#FF8A80" />
+        <View style={{ backgroundColor: colors.primary + '33' }} className="absolute top-2 left-2 rounded-full p-1.5">
+          <Play size={12} color={colors.primary} fill={colors.primary} />
         </View>
       )}
-      <Icon size={32} color={selected ? '#FF8A80' : '#5C5470'} />
+      <Icon size={32} color={selected ? colors.primary : iconColor} />
       <Text 
-        className="text-base font-semibold text-text mt-3 text-center"
-        style={{ fontFamily: 'Nunito_600SemiBold' }}>
+        className="text-base font-semibold mt-3 text-center"
+        style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
         {name}
       </Text>
     </AnimatedPressable>

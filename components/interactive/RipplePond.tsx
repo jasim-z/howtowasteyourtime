@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
 import { playSound } from '@/lib/sounds';
+import { useTheme } from '@/lib/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -18,6 +19,7 @@ interface Ripple {
 }
 
 export function RipplePond() {
+  const { colors, theme } = useTheme();
   const [ripples, setRipples] = useState<Ripple[]>([]);
 
   const handleTap = (event: any) => {
@@ -46,7 +48,9 @@ export function RipplePond() {
       style={{ position: 'relative', overflow: 'hidden' }}>
       {/* Pond background with gradient */}
       <LinearGradient
-        colors={['#B8E6D8', '#A0D4C4', '#8EC4B0']}
+        colors={theme === 'light' 
+          ? ['#B8E6D8', '#A0D4C4', '#8EC4B0']
+          : [colors.secondary, colors.secondary + 'DD', colors.secondary + 'BB']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -70,6 +74,7 @@ export function RipplePond() {
 }
 
 function RippleAnimation({ x, y }: { x: number; y: number }) {
+  const { colors } = useTheme();
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0.6);
 
@@ -96,7 +101,7 @@ function RippleAnimation({ x, y }: { x: number; y: number }) {
           height: 50,
           borderRadius: 25,
           borderWidth: 2.5,
-          borderColor: '#FFFFFF',
+          borderColor: colors.card,
           backgroundColor: 'transparent',
         },
         animatedStyle,

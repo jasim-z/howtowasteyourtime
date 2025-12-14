@@ -6,6 +6,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { useTheme } from '@/lib/ThemeContext';
 
 interface ButtonProps {
   title: string;
@@ -26,6 +27,7 @@ export function Button({
   icon,
   className = '',
 }: ButtonProps) {
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -47,15 +49,27 @@ export function Button({
   };
 
   const baseClasses = 'rounded-full py-4 px-8 items-center justify-center';
-  const variantClasses = {
-    primary: 'bg-primary shadow-md',
-    secondary: 'bg-card border border-gray-200',
-    ghost: 'bg-transparent',
+  
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'primary':
+        return { backgroundColor: colors.primary };
+      case 'secondary':
+        return { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.textLight + '40' };
+      case 'ghost':
+        return { backgroundColor: 'transparent' };
+    }
   };
-  const textClasses = {
-    primary: 'text-white text-lg font-semibold',
-    secondary: 'text-text text-lg font-semibold',
-    ghost: 'text-text text-lg font-medium',
+
+  const getTextColor = () => {
+    switch (variant) {
+      case 'primary':
+        return '#FFFFFF';
+      case 'secondary':
+        return colors.text;
+      case 'ghost':
+        return colors.text;
+    }
   };
 
   return (
@@ -64,12 +78,20 @@ export function Button({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
-      style={[animatedStyle, disabled && { opacity: 0.5 }]}
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
+      style={[
+        animatedStyle,
+        disabled && { opacity: 0.5 },
+        getVariantStyle(),
+        variant === 'primary' && { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+      ]}
+      className={`${baseClasses} ${className}`}>
       <View className="flex-row items-center justify-center gap-2">
         <Text 
-          className={textClasses[variant]}
-          style={{ fontFamily: variant === 'primary' ? 'Nunito_600SemiBold' : variant === 'secondary' ? 'Nunito_600SemiBold' : 'Nunito_500Medium' }}>
+          className="text-lg font-semibold"
+          style={{ 
+            fontFamily: variant === 'primary' ? 'Nunito_600SemiBold' : variant === 'secondary' ? 'Nunito_600SemiBold' : 'Nunito_500Medium',
+            color: getTextColor(),
+          }}>
           {title}
         </Text>
         {icon && icon}

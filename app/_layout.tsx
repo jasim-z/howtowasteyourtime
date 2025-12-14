@@ -3,14 +3,16 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import { Platform } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import '../global.css';
 import { StatsProvider } from '@/lib/StatsContext';
+import { ThemeProvider as AppThemeProvider, useTheme } from '@/lib/ThemeContext';
 import { soundManager } from '@/lib/sounds';
 
 import {
@@ -20,20 +22,7 @@ import {
   Nunito_700Bold,
 } from '@expo-google-fonts/nunito';
 
-// Custom theme with our color palette - extend DefaultTheme to avoid font issues
-const CustomTheme = {
-  ...DefaultTheme,
-  dark: false,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#FF8A80',
-    background: '#E8E0F0',
-    card: '#FFF8F0',
-    text: '#5C5470',
-    border: '#8E8A9D',
-    notification: '#FF8A80',
-  },
-};
+// Custom theme will be created dynamically in StackWithTheme
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -88,30 +77,98 @@ function RootLayoutNav() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatsProvider>
-          <ThemeProvider value={CustomTheme}>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                animation: 'slide_from_right',
-                gestureEnabled: true,
-                contentStyle: { backgroundColor: '#E8E0F0' },
-              }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="activities" />
-              <Stack.Screen name="timer" />
-              <Stack.Screen name="complete" />
-              <Stack.Screen
-                name="add-activity"
-                options={{
-                  presentation: 'transparentModal',
-                  animation: 'fade',
-                }}
-              />
-            </Stack>
-          </ThemeProvider>
-        </StatsProvider>
+        <AppThemeProvider>
+          <StatsProvider>
+            <BackgroundWrapper>
+              <StackWithTheme />
+            </BackgroundWrapper>
+          </StatsProvider>
+        </AppThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function BackgroundWrapper({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {children}
+    </View>
+  );
+}
+
+function StackWithTheme() {
+  const { colors, theme } = useTheme();
+  
+  // Create dynamic navigation theme
+  const navigationTheme = {
+    ...DefaultTheme,
+    dark: theme === 'dark',
+    colors: {
+      ...DefaultTheme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.text,
+      border: colors.textLight,
+      notification: colors.primary,
+    },
+  };
+  
+  return (
+    <ThemeProvider value={navigationTheme}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: Platform.OS === 'android' ? 'fade' : 'slide_from_right',
+            gestureEnabled: true,
+            contentStyle: { backgroundColor: colors.background },
+            animationDuration: Platform.OS === 'android' ? 150 : 200,
+            cardStyle: { backgroundColor: colors.background },
+            cardOverlayEnabled: false,
+            cardShadowEnabled: false,
+          }}>
+          <Stack.Screen 
+            name="index"
+            options={{
+              cardStyle: { backgroundColor: colors.background },
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen 
+            name="activities"
+            options={{
+              cardStyle: { backgroundColor: colors.background },
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen 
+            name="timer"
+            options={{
+              cardStyle: { backgroundColor: colors.background },
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen 
+            name="complete"
+            options={{
+              cardStyle: { backgroundColor: colors.background },
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <Stack.Screen
+            name="add-activity"
+            options={{
+              presentation: 'transparentModal',
+              animation: 'fade',
+              contentStyle: { backgroundColor: 'transparent' },
+              cardStyle: { backgroundColor: 'transparent' },
+            }}
+          />
+        </Stack>
+      </View>
+    </ThemeProvider>
   );
 }

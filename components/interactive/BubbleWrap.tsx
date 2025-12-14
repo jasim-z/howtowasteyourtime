@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { haptics } from '@/lib/haptics';
 import { playSound } from '@/lib/sounds';
+import { useTheme } from '@/lib/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 const BUBBLE_SIZE = 50;
@@ -23,6 +24,7 @@ interface BubbleProps {
 }
 
 function Bubble({ index, isPopped, onPop }: BubbleProps) {
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -60,9 +62,9 @@ function Bubble({ index, isPopped, onPop }: BubbleProps) {
           width: BUBBLE_SIZE,
           height: BUBBLE_SIZE,
           borderRadius: BUBBLE_SIZE / 2,
-          backgroundColor: '#FFF8F0',
+          backgroundColor: colors.card,
           borderWidth: 1.5,
-          borderColor: '#E8E0F0',
+          borderColor: colors.background,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,

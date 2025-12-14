@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   runOnJS,
 } from 'react-native-reanimated';
+import { useTheme } from '@/lib/ThemeContext';
 
 interface Stroke {
   id: string;
@@ -17,6 +18,7 @@ interface Stroke {
 const FADE_TIME = 4000; // 4 seconds
 
 export function DoodlePad() {
+  const { colors } = useTheme();
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [currentPath, setCurrentPath] = useState('');
   const pathRef = React.useRef<string>('');
@@ -26,14 +28,14 @@ export function DoodlePad() {
       const newStroke: Stroke = {
         id: Date.now().toString(),
         path: path,
-        color: '#FF8A80',
+        color: colors.primary,
         createdAt: Date.now(),
       };
       setStrokes((prev) => [...prev, newStroke]);
     }
     pathRef.current = '';
     setCurrentPath('');
-  }, []);
+  }, [colors.primary]);
 
   const pan = Gesture.Pan()
     .onStart((event) => {
@@ -62,7 +64,7 @@ export function DoodlePad() {
   }, []);
 
   return (
-    <View className="flex-1 bg-card">
+    <View className="flex-1" style={{ backgroundColor: colors.card }}>
       <GestureDetector gesture={pan}>
         <Animated.View className="flex-1">
           <Svg style={StyleSheet.absoluteFill}>
@@ -86,7 +88,7 @@ export function DoodlePad() {
             {currentPath && (
               <Path
                 d={currentPath}
-                stroke="#FF8A80"
+                stroke={colors.primary}
                 strokeWidth={3}
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -9,10 +9,12 @@ import { defaultActivities } from '@/constants/activities';
 import { iconMap } from '@/constants/iconMap';
 import { loadCustomActivities, saveCustomActivities } from '@/lib/storage';
 import { Activity, CustomActivity } from '@/lib/types';
+import { useTheme } from '@/lib/ThemeContext';
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from '@expo-google-fonts/nunito';
 
 export default function ActivitiesScreen() {
   const router = useRouter();
+  const { colors, iconColor, iconColorLight } = useTheme();
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [allActivities, setAllActivities] = useState<Activity[]>(defaultActivities);
 
@@ -103,8 +105,9 @@ export default function ActivitiesScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false} style={{ backgroundColor: colors.background }}>
         {/* Header Section */}
         <View className="pt-6 px-6">
           {/* Back Button */}
@@ -117,20 +120,20 @@ export default function ActivitiesScreen() {
               }
             }}
             className="mb-4 self-start">
-            <ChevronLeft size={24} color="#5C5470" />
+            <ChevronLeft size={24} color={iconColor} />
           </Pressable>
 
           {/* Title */}
           <Text 
-            className="text-2xl font-bold text-text"
-            style={{ fontFamily: 'Nunito_700Bold' }}>
+            className="text-2xl font-bold"
+            style={{ fontFamily: 'Nunito_700Bold', color: colors.text }}>
             Pick your pointless activity
           </Text>
 
           {/* Subtitle */}
           <Text 
-            className="text-base text-textLight mt-1"
-            style={{ fontFamily: 'Nunito_400Regular' }}>
+            className="text-base mt-1"
+            style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
             Choose wisely. Or don't.
           </Text>
         </View>
@@ -138,8 +141,8 @@ export default function ActivitiesScreen() {
         {/* Passive Activities Section */}
         <View className="px-6 mt-6">
           <Text 
-            className="text-lg font-semibold text-text mb-4"
-            style={{ fontFamily: 'Nunito_600SemiBold' }}>
+            className="text-lg font-semibold mb-4"
+            style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
             Just sit there
           </Text>
           <View className="flex-row flex-wrap" style={{ gap: 16 }}>
@@ -166,8 +169,8 @@ export default function ActivitiesScreen() {
         {/* Interactive Activities Section */}
         <View className="px-6 mt-8">
           <Text 
-            className="text-lg font-semibold text-text mb-4"
-            style={{ fontFamily: 'Nunito_600SemiBold' }}>
+            className="text-lg font-semibold mb-4"
+            style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
             Interactive
           </Text>
           <View className="flex-row flex-wrap" style={{ gap: 16 }}>
@@ -195,11 +198,17 @@ export default function ActivitiesScreen() {
         <View className="px-6 mt-6">
           <Pressable
             onPress={() => router.push('/add-activity')}
-            className="bg-transparent rounded-3xl p-5 items-center justify-center w-[47%] border-2 border-dashed border-textLight">
-            <Plus size={32} color="#8E8A9D" />
+            style={{
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderStyle: 'dashed',
+              borderColor: colors.textLight,
+            }}
+            className="rounded-3xl p-5 items-center justify-center w-[47%]">
+            <Plus size={32} color={iconColorLight} />
             <Text 
-              className="text-base text-textLight mt-3 text-center"
-              style={{ fontFamily: 'Nunito_400Regular' }}>
+              className="text-base mt-3 text-center"
+              style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
               Add your own
             </Text>
           </Pressable>
@@ -210,7 +219,7 @@ export default function ActivitiesScreen() {
       </ScrollView>
 
       {/* Fixed Bottom Button */}
-      <View className="p-6 bg-background">
+      <View className="p-6" style={{ backgroundColor: colors.background }}>
         <Button
           title="Start wasting time"
           onPress={handleStartTimer}
@@ -219,6 +228,7 @@ export default function ActivitiesScreen() {
           icon={<ArrowRight size={20} color="white" />}
           className="w-full"
         />
+      </View>
       </View>
     </SafeAreaView>
   );

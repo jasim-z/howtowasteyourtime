@@ -10,6 +10,7 @@ import Animated, {
   Easing,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import { useTheme } from '@/lib/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -20,6 +21,7 @@ interface CircularTimerProps {
 }
 
 export function CircularTimer({ totalSeconds, remainingSeconds, isPaused }: CircularTimerProps) {
+  const { colors } = useTheme();
   const size = 256;
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
@@ -77,7 +79,7 @@ export function CircularTimer({ totalSeconds, remainingSeconds, isPaused }: Circ
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#E0E0E0"
+          stroke={colors.textLight + '40'}
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -86,7 +88,7 @@ export function CircularTimer({ totalSeconds, remainingSeconds, isPaused }: Circ
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#FF8A80"
+          stroke={colors.primary}
           strokeWidth={strokeWidth}
           fill="transparent"
           strokeDasharray={circumference}
@@ -95,13 +97,14 @@ export function CircularTimer({ totalSeconds, remainingSeconds, isPaused }: Circ
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </Svg>
-      <View className="bg-card rounded-full w-64 h-64 items-center justify-center">
+      <View style={{ backgroundColor: colors.card }} className="rounded-full w-64 h-64 items-center justify-center">
         <Text 
-          className="text-5xl font-bold text-text"
+          className="text-5xl font-bold"
           style={{ 
             fontFamily: 'Nunito_700Bold',
             lineHeight: 64,
             includeFontPadding: false,
+            color: colors.text,
           }}>
           {formatTime(remainingSeconds)}
         </Text>

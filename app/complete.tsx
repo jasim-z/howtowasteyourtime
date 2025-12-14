@@ -20,9 +20,11 @@ import { formatTime } from '@/lib/statsStorage';
 import { checkMilestones } from '@/lib/milestones';
 import { Calendar } from 'lucide-react-native';
 import { haptics } from '@/lib/haptics';
+import { useTheme } from '@/lib/ThemeContext';
 
 export default function CompleteScreen() {
   const router = useRouter();
+  const { colors, iconColor } = useTheme();
   const { activityId, isCustom } = useLocalSearchParams<{ activityId: string; isCustom?: string }>();
   const [activity, setActivity] = useState<Activity | null>(null);
   const { stats, refreshStats } = useStats();
@@ -95,10 +97,9 @@ export default function CompleteScreen() {
 
   if (!activity) {
     return (
-      <SafeAreaView className="flex-1 bg-background items-center justify-center">
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
         <Text 
-          className="text-text"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.text }}>
           Activity not found
         </Text>
       </SafeAreaView>
@@ -106,7 +107,7 @@ export default function CompleteScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
       <ScrollView 
         className="flex-1" 
         contentContainerStyle={{ alignItems: 'center', paddingBottom: 32 }}
@@ -117,8 +118,8 @@ export default function CompleteScreen() {
           pointerEvents="none">
           <View className="flex-row justify-center flex-wrap pt-20">
             {[...Array(20)].map((_, i) => {
-              const colors = ['#FF8A80', '#B8F0D8', '#E8E0F0', '#FFF8F0'];
-              const color = colors[i % colors.length];
+              const confettiColors = [colors.primary, colors.secondary, colors.background, colors.card];
+              const color = confettiColors[i % confettiColors.length];
               const left = `${(i * 5) % 100}%`;
               const delay = i * 100;
               return (
@@ -141,46 +142,46 @@ export default function CompleteScreen() {
 
         {/* Icon */}
         <Animated.View style={[iconAnimatedStyle, { marginTop: 64 }]}>
-          <PartyPopper size={64} color="#FF8A80" />
+          <PartyPopper size={64} color={colors.primary} />
         </Animated.View>
 
         {/* Title */}
         <Text 
-          className="text-3xl font-bold text-text text-center mt-6"
-          style={{ fontFamily: 'Nunito_700Bold' }}>
+          className="text-3xl font-bold text-center mt-6"
+          style={{ fontFamily: 'Nunito_700Bold', color: colors.text }}>
           5 minutes wasted.
         </Text>
 
         {/* Subtitle */}
         <Text 
-          className="text-xl text-textLight text-center mt-2"
-          style={{ fontFamily: 'Nunito_400Regular' }}>
+          className="text-xl text-center mt-2"
+          style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
           Proud of you.
         </Text>
 
         {/* Milestone Celebration */}
         {milestone && (
-          <View className="mx-6 mt-4 bg-primary/20 rounded-2xl p-4 border-2 border-primary">
+          <View style={{ backgroundColor: colors.primary + '33', borderWidth: 2, borderColor: colors.primary }} className="mx-6 mt-4 rounded-2xl p-4">
             <Text 
-              className="text-lg font-semibold text-text text-center"
-              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              className="text-lg font-semibold text-center"
+              style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
               {milestone.emoji} {milestone.message}
             </Text>
           </View>
         )}
 
         {/* Completed Activity Card */}
-        <View className="mx-6 mt-10 bg-card rounded-2xl p-5 shadow-sm">
+        <View style={{ backgroundColor: colors.card }} className="mx-6 mt-10 rounded-2xl p-5 shadow-sm">
           <Text 
-            className="text-base text-textLight"
-            style={{ fontFamily: 'Nunito_400Regular' }}>
+            className="text-base"
+            style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
             You successfully did:
           </Text>
           <View className="flex-row items-center gap-2 mt-2">
-            {ActivityIcon && <ActivityIcon size={24} color="#FF8A80" />}
+            {ActivityIcon && <ActivityIcon size={24} color={colors.primary} />}
             <Text 
-              className="text-lg font-semibold text-text"
-              style={{ fontFamily: 'Nunito_600SemiBold' }}>
+              className="text-lg font-semibold"
+              style={{ fontFamily: 'Nunito_600SemiBold', color: colors.text }}>
               {activity.name}
             </Text>
           </View>
@@ -188,27 +189,27 @@ export default function CompleteScreen() {
 
         {/* Stats Card */}
         {stats && (
-          <View className="mx-6 mt-4 bg-secondary/30 rounded-2xl p-4">
+          <View style={{ backgroundColor: colors.secondary + '4D' }} className="mx-6 mt-4 rounded-2xl p-4">
             <View className="flex-row items-center gap-2 mb-3">
-              <Clock size={16} color="#5C5470" />
+              <Clock size={16} color={iconColor} />
               <Text 
-                className="text-sm text-text"
-                style={{ fontFamily: 'Nunito_500Medium' }}>
+                className="text-sm"
+                style={{ fontFamily: 'Nunito_500Medium', color: colors.text }}>
                 Today: {formatTime(stats.totalSecondsToday)} wasted
               </Text>
             </View>
             <View className="flex-row items-center gap-2">
-              <Calendar size={16} color="#5C5470" />
+              <Calendar size={16} color={iconColor} />
               <Text 
-                className="text-sm text-text"
-                style={{ fontFamily: 'Nunito_500Medium' }}>
+                className="text-sm"
+                style={{ fontFamily: 'Nunito_500Medium', color: colors.text }}>
                 All time: {formatTime(stats.totalSecondsAllTime)}
               </Text>
             </View>
             {stats.totalSecondsToday > 0 && (
               <Text 
-                className="text-xs text-textLight text-center mt-3"
-                style={{ fontFamily: 'Nunito_400Regular' }}>
+                className="text-xs text-center mt-3"
+                style={{ fontFamily: 'Nunito_400Regular', color: colors.textLight }}>
                 You've wasted {formatTime(stats.totalSecondsToday)} today. Keep it up!
               </Text>
             )}
@@ -227,8 +228,8 @@ export default function CompleteScreen() {
             onPress={() => router.push('/')}
             className="bg-transparent py-4 mt-3">
             <Text 
-              className="text-text text-lg font-medium text-center"
-              style={{ fontFamily: 'Nunito_500Medium' }}>
+              className="text-lg font-medium text-center"
+              style={{ fontFamily: 'Nunito_500Medium', color: colors.text }}>
               I'm done for now
             </Text>
           </Pressable>
